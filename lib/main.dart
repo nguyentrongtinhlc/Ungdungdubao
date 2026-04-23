@@ -54,8 +54,8 @@ class _WeatherPageState extends State<WeatherPage> {
 
       // 2. Lấy Full dữ liệu (Hiện tại + 3 năm quá khứ)
       final data = await _service.getFullData(lat, lon, name);
-      // 3. Gọi AI phân tích
-      final aiRes = await _service.analyzeWithGroq(data, disasterInfo);
+      // 3. Phân tích cảnh báo thiên tai dựa trên kỷ lục lịch sử (không cần AI)
+      final aiRes = _service.analyzeDisasterRisk(data, disasterInfo);
 
       setState(() {
         _weather = data;
