@@ -84,44 +84,55 @@ class WeatherService {
     );
   }
 
-  // 4. Gọi Groq AI phân tích (Bạn thay Key của bạn vào)
-  Future<String> analyzeWithGroq(WeatherData data, DisasterHistory? disasterHistory) async {
-    const String groqKey =
-        "gsk_m8oX9zO9W38XU6W3oZ8W3oZ8W3oZ8W3oZ8W3oZ8W3oZ8W3oZ8";
-    String histContext = data.history
-        .map((e) => "Ngày ${e.date}: ${e.maxTemp}C, Mưa ${e.rain}mm")
-        .join(". ");
+  // 4. Phân tích cảnh báo thiên tai dựa trên ngưỡng kỷ lục lịch sử (không cần AI)
+  String analyzeDisasterRisk(WeatherData data, DisasterHistory? disaster) {
+    final double rain = data.precipitation;
+    final double wind = data.windSpeed;
 
-    String disasterContext = "";
-    if (disasterHistory != null) {
-      disasterContext = "Kỷ lục lịch sử tại ${disasterHistory.province}: Mưa tối đa ${disasterHistory.maxRain}mm, Gió tối đa ${disasterHistory.maxWind}km/h (${disasterHistory.eventName}). ";
+    // Dùng ngưỡng kỷ lục của địa phương, hoặc ngưỡng chung nếu không có
+    final double rainThreshold = disaster?.maxRain ?? 200.0;
+    final double windThreshold = disaster?.maxWind ?? 100.0;
+    final String eventName = disaster?.eventName ?? "thiên tai";
+    final String province = disaster?.province ?? data.cityName;
+
+    // Tính % so với kỷ lục
+    final double rainRatio = rainThreshold > 0 ? rain / rainThreshold : 0;
+    final double windRatio = windThreshold > 0 ? wind / windThreshold : 0;
+
+    List<String> warnings = [];
+    List<String> tips = [];
+
+    // --- CẢNH BÁO MƯA ---
+    if (rainRatio >= 0.8) {
+      warnings.add("⚠️ Lượng mưa ${rain}mm đạt ${(rainRatio * 100).round()}% ngưỡng lũ lịch sử ($eventName)!");
+      tips.add("• Không ra đường khi mưa lớn, tránh vùng trũng thấp.");
+      tips.add("• Chuẩn bị đồ dự phòng, di chuyển lên vùng cao nếu cần.");
+    } else if (rainRatio >= 0.5) {
+      warnings.add("🔶 Lượng mưa ${rain}mm ở mức trung bình so với kỷ lục lũ tại $province.");
+      tips.add("• Theo dõi tin tức thời tiết, hạn chế ra ngoài khi mưa to.");
     }
 
-    final prompt =
-        "Thông tin thời tiết hiện tại: Nhiệt độ ${data.currentTemp}C, Lượng mưa ${data.precipitation}mm, Tốc độ gió ${data.windSpeed}km/h. "
-        "$disasterContext. "
-        "Dữ liệu 3 năm qua: $histContext. "
-        "YÊU CẦU: Dựa vào thời tiết hiện tại và so sánh với Kỷ lục thiên tai lịch sử, nếu thời tiết hiện tại có lượng mưa hoặc tốc độ gió cao (có khả năng hoặc nguy cơ xảy ra thiên tai tương tự), hãy phát ra 'CẢNH BÁO THIÊN TAI' và hướng dẫn chi tiết 'CÁCH PHÒNG CHỐNG'. Nếu thời tiết hiện tại an toàn, hãy dự báo bình thường. Trả lời bằng tiếng Việt (tối đa 100 từ).";
-
-    try {
-      final res = await http.post(
-        Uri.parse('https://api.groq.com/openai/v1/chat/completions'),
-        headers: {
-          'Authorization': 'Bearer $groqKey',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          "model": "llama3-8b-8192",
-          "messages": [
-            {"role": "user", "content": prompt},
-          ],
-        }),
-      );
-      return jsonDecode(
-        utf8.decode(res.bodyBytes),
-      )['choices'][0]['message']['content'];
-    } catch (e) {
-      return "✅ Dữ liệu lịch sử cho thấy thời tiết đang ở mức an toàn.";
+    // --- CẢNH BÁO GIÓ ---
+    if (windRatio >= 0.8) {
+      warnings.add("⚠️ Tốc độ gió ${wind}km/h đạt ${(windRatio * 100).round()}% ngưỡng bão lịch sử ($eventName)!");
+      tips.add("• Không đứng gần cây lớn, biển quảng cáo, mái tôn.");
+      tips.add("• Gia cố cửa sổ, sơ tán nếu có lệnh chính quyền.");
+    } else if (windRatio >= 0.5) {
+      warnings.add("🔶 Tốc độ gió ${wind}km/h ở mức đáng chú ý, cần đề phòng.");
+      tips.add("• Không ra khơi, hạn chế đi lại bằng xe máy.");
     }
+
+    // --- KẾT QUẢ ---
+    if (warnings.isEmpty) {
+      String histNote = "";
+      if (data.history.isNotEmpty) {
+        final avgRain = data.history.map((e) => e.rain).reduce((a, b) => a + b) / data.history.length;
+        histNote = " Trung bình mưa cùng ngày 3 năm qua: ${avgRain.toStringAsFixed(1)}mm.";
+      }
+      return "✅ Thời tiết hiện tại an toàn so với kỷ lục thiên tai tại $province.$histNote\n\n📌 Kỷ lục lịch sử: Mưa ${rainThreshold}mm, Gió ${windThreshold}km/h ($eventName).";
+    }
+
+    return "🚨 CẢNH BÁO THIÊN TAI\n\n${warnings.join('\n')}\n\n🛡 CÁCH PHÒNG CHỐNG:\n${tips.join('\n')}";
   }
 }
+
