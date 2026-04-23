@@ -170,25 +170,31 @@ class _WeatherPageState extends State<WeatherPage> {
   }
 
   Widget _buildAICard() {
+    bool isWarning = aiAnalysis.contains("CẢNH BÁO") || aiAnalysis.contains("PHÒNG CHỐNG");
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.blue[50],
+        color: isWarning ? Colors.orange[50] : Colors.blue[50],
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.blue[100]!),
+        border: Border.all(color: isWarning ? Colors.orange[200]! : Colors.blue[100]!),
       ),
       child: Column(
         children: [
           Row(
             children: [
-              const Icon(Icons.auto_awesome, color: Colors.blue, size: 20),
+              Icon(
+                isWarning ? Icons.warning_rounded : Icons.auto_awesome, 
+                color: isWarning ? Colors.deepOrange : Colors.blue, 
+                size: 20
+              ),
               const SizedBox(width: 10),
-              const Text(
-                "DỰ BÁO DỰA TRÊN LỊCH SỬ",
+              Text(
+                isWarning ? "CẢNH BÁO THIÊN TAI & PHÒNG CHỐNG" : "DỰ BÁO DỰA TRÊN LỊCH SỬ",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 11,
-                  color: Colors.blue,
+                  color: isWarning ? Colors.deepOrange : Colors.blue,
                 ),
               ),
               const Spacer(),
@@ -203,10 +209,11 @@ class _WeatherPageState extends State<WeatherPage> {
           const SizedBox(height: 10),
           Text(
             aiAnalysis,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               height: 1.5,
-              color: Colors.black87,
+              fontWeight: isWarning ? FontWeight.w500 : FontWeight.normal,
+              color: isWarning ? Colors.red[900] : Colors.black87,
             ),
           ),
         ],
