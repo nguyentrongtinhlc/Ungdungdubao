@@ -1,0 +1,382 @@
+{
+  "disasters": [
+    {
+      "province": "Hà Nội",
+      "maxRain": 400.0,
+      "maxWind": 100.0,
+      "eventName": "Ngập lụt lịch sử nội đô"
+    },
+    {
+      "province": "Hà Giang",
+      "maxRain": 300.0,
+      "maxWind": 90.0,
+      "eventName": "Lũ quét và sạt lở đất do bão Yagi"
+    },
+    {
+      "province": "Cao Bằng",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Bắc Kạn",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Tuyên Quang",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Lào Cai",
+      "maxRain": 300.0,
+      "maxWind": 90.0,
+      "eventName": "Lũ quét và sạt lở đất do bão Yagi"
+    },
+    {
+      "province": "Điện Biên",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Lai Châu",
+      "maxRain": 300.0,
+      "maxWind": 90.0,
+      "eventName": "Lũ quét và sạt lở đất do bão Yagi"
+    },
+    {
+      "province": "Sơn La",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Yên Bái",
+      "maxRain": 300.0,
+      "maxWind": 90.0,
+      "eventName": "Lũ quét và sạt lở đất do bão Yagi"
+    },
+    {
+      "province": "Hòa Bình",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Thái Nguyên",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Lạng Sơn",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Quảng Ninh",
+      "maxRain": 350.0,
+      "maxWind": 160.0,
+      "eventName": "Siêu bão Yagi 2024"
+    },
+    {
+      "province": "Bắc Giang",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Phú Thọ",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Vĩnh Phúc",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Bắc Ninh",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Hải Dương",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Hải Phòng",
+      "maxRain": 350.0,
+      "maxWind": 160.0,
+      "eventName": "Siêu bão Yagi 2024"
+    },
+    {
+      "province": "Hưng Yên",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Thái Bình",
+      "maxRain": 350.0,
+      "maxWind": 160.0,
+      "eventName": "Siêu bão Yagi 2024"
+    },
+    {
+      "province": "Hà Nam",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Nam Định",
+      "maxRain": 350.0,
+      "maxWind": 160.0,
+      "eventName": "Siêu bão Yagi 2024"
+    },
+    {
+      "province": "Ninh Bình",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Thanh Hóa",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Nghệ An",
+      "maxRain": 800.0,
+      "maxWind": 160.0,
+      "eventName": "Lũ lụt lịch sử miền Trung 2020"
+    },
+    {
+      "province": "Hà Tĩnh",
+      "maxRain": 800.0,
+      "maxWind": 160.0,
+      "eventName": "Lũ lụt lịch sử miền Trung 2020"
+    },
+    {
+      "province": "Quảng Bình",
+      "maxRain": 800.0,
+      "maxWind": 160.0,
+      "eventName": "Lũ lụt lịch sử miền Trung 2020"
+    },
+    {
+      "province": "Quảng Trị",
+      "maxRain": 800.0,
+      "maxWind": 160.0,
+      "eventName": "Lũ lụt lịch sử miền Trung 2020"
+    },
+    {
+      "province": "Thừa Thiên Huế",
+      "maxRain": 800.0,
+      "maxWind": 160.0,
+      "eventName": "Lũ lụt lịch sử miền Trung 2020"
+    },
+    {
+      "province": "Đà Nẵng",
+      "maxRain": 600.0,
+      "maxWind": 180.0,
+      "eventName": "Bão số 9 (Molave) 2020"
+    },
+    {
+      "province": "Quảng Nam",
+      "maxRain": 600.0,
+      "maxWind": 180.0,
+      "eventName": "Bão số 9 (Molave) 2020"
+    },
+    {
+      "province": "Quảng Ngãi",
+      "maxRain": 600.0,
+      "maxWind": 180.0,
+      "eventName": "Bão số 9 (Molave) 2020"
+    },
+    {
+      "province": "Bình Định",
+      "maxRain": 600.0,
+      "maxWind": 180.0,
+      "eventName": "Bão số 9 (Molave) 2020"
+    },
+    {
+      "province": "Phú Yên",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Khánh Hòa",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Ninh Thuận",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Bình Thuận",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Kon Tum",
+      "maxRain": 200.0,
+      "maxWind": 100.0,
+      "eventName": "Lũ quét Tây Nguyên"
+    },
+    {
+      "province": "Gia Lai",
+      "maxRain": 200.0,
+      "maxWind": 100.0,
+      "eventName": "Lũ quét Tây Nguyên"
+    },
+    {
+      "province": "Đắk Lắk",
+      "maxRain": 200.0,
+      "maxWind": 100.0,
+      "eventName": "Lũ quét Tây Nguyên"
+    },
+    {
+      "province": "Đắk Nông",
+      "maxRain": 200.0,
+      "maxWind": 100.0,
+      "eventName": "Lũ quét Tây Nguyên"
+    },
+    {
+      "province": "Lâm Đồng",
+      "maxRain": 200.0,
+      "maxWind": 100.0,
+      "eventName": "Lũ quét Tây Nguyên"
+    },
+    {
+      "province": "Bình Phước",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Tây Ninh",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Bình Dương",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Đồng Nai",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Bà Rịa - Vũng Tàu",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Hồ Chí Minh",
+      "maxRain": 400.0,
+      "maxWind": 100.0,
+      "eventName": "Ngập lụt lịch sử nội đô"
+    },
+    {
+      "province": "Long An",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Tiền Giang",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Bến Tre",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Trà Vinh",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Vĩnh Long",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Đồng Tháp",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "An Giang",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Kiên Giang",
+      "maxRain": 250.0,
+      "maxWind": 130.0,
+      "eventName": "Bão Linda 1997"
+    },
+    {
+      "province": "Cần Thơ",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Hậu Giang",
+      "maxRain": 250.0,
+      "maxWind": 110.0,
+      "eventName": "Mưa lũ diện rộng"
+    },
+    {
+      "province": "Sóc Trăng",
+      "maxRain": 250.0,
+      "maxWind": 130.0,
+      "eventName": "Bão Linda 1997"
+    },
+    {
+      "province": "Bạc Liêu",
+      "maxRain": 250.0,
+      "maxWind": 130.0,
+      "eventName": "Bão Linda 1997"
+    },
+    {
+      "province": "Cà Mau",
+      "maxRain": 250.0,
+      "maxWind": 130.0,
+      "eventName": "Bão Linda 1997"
+    }
+  ]
+}
