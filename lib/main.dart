@@ -150,6 +150,10 @@ class _WeatherPageState extends State<WeatherPage> {
 
                   // 5. GRID 6 THÔNG SỐ
                   _buildStatGrid(),
+                  const SizedBox(height: 16),
+
+                  // 6. HƯỚNG DẪN THỜI TIẾT HÔM NAY
+                  _buildWeatherTips(),
                   const SizedBox(height: 50),
                 ],
               ),
@@ -400,6 +404,100 @@ class _WeatherPageState extends State<WeatherPage> {
         _stat("Tầm nhìn", "${_weather!.visibility}km", Icons.visibility),
         _stat("Độ ẩm", "${_weather!.humidity}%", Icons.water_drop),
       ],
+    );
+  Widget _buildWeatherTips() {
+    final w = _weather!;
+    final List<Map<String, dynamic>> tips = [];
+
+    // Nhiệt độ
+    if (w.currentTemp >= 37) {
+      tips.add({'icon': Icons.thermostat, 'color': Colors.red, 'text': 'Nắng nóng gay gắt (${w.currentTemp.round()}°C). Uống đủ nước, hạn chế ra ngoài lúc 10h-16h.'});
+    } else if (w.currentTemp >= 33) {
+      tips.add({'icon': Icons.wb_sunny, 'color': Colors.orange, 'text': 'Trời nóng (${w.currentTemp.round()}°C). Nên mặc áo chống nắng, đội nón khi ra đường.'});
+    } else if (w.currentTemp <= 15) {
+      tips.add({'icon': Icons.ac_unit, 'color': Colors.blue, 'text': 'Trời lạnh (${w.currentTemp.round()}°C). Mặc áo ấm, giữ ấm cơ thể khi ra ngoài.'});
+    } else if (w.currentTemp <= 22) {
+      tips.add({'icon': Icons.air, 'color': Colors.lightBlue, 'text': 'Thời tiết mát mẻ (${w.currentTemp.round()}°C). Thích hợp đi dạo ngoài trời.'});
+    }
+
+    // Lượng mưa
+    if (w.precipitation > 20) {
+      tips.add({'icon': Icons.umbrella, 'color': Colors.indigo, 'text': 'Mưa rất to (${w.precipitation}mm). Mang áo mưa, tránh vùng trũng thấp có thể ngập nước.'});
+    } else if (w.precipitation > 5) {
+      tips.add({'icon': Icons.umbrella, 'color': Colors.blueAccent, 'text': 'Có mưa (${w.precipitation}mm). Nên mang theo áo mưa hoặc ô.'});
+    }
+
+    // Tốc độ gió
+    if (w.windSpeed > 60) {
+      tips.add({'icon': Icons.air, 'color': Colors.red, 'text': 'Gió rất mạnh (${w.windSpeed}km/h). Không nên đi xe máy, tránh vùng trống trải.'});
+    } else if (w.windSpeed > 30) {
+      tips.add({'icon': Icons.air, 'color': Colors.orange, 'text': 'Gió khá mạnh (${w.windSpeed}km/h). Cẩn thận khi đi xe máy.'});
+    }
+
+    // Chỉ số UV
+    if (w.uvIndex >= 8) {
+      tips.add({'icon': Icons.wb_sunny, 'color': Colors.deepOrange, 'text': 'Tìa UV rất cao (${w.uvIndex.round()}). Bôi kem chống nắng SPF50+, mặc áo dài, đi khẩu trang.'});
+    } else if (w.uvIndex >= 5) {
+      tips.add({'icon': Icons.wb_sunny, 'color': Colors.amber, 'text': 'Tìa UV cao (${w.uvIndex.round()}). Nên bôi kem chống nắng khi ra ngoài.'});
+    }
+
+    // Độ ẩm
+    if (w.humidity > 85) {
+      tips.add({'icon': Icons.water_drop, 'color': Colors.teal, 'text': 'Độ ẩm rất cao (${w.humidity.round()}%). Dễ nấm mốc, cần thông thoáng nhà cửa.'});
+    }
+
+    // Tầm nhìn
+    if (w.visibility < 1) {
+      tips.add({'icon': Icons.visibility_off, 'color': Colors.grey, 'text': 'Tầm nhìn rất kém (<1km). Bật đèn xe, đi chậm và cẩn thận.'});
+    }
+
+    // Nếu không có lưu ý đặc biệt nào
+    if (tips.isEmpty) {
+      tips.add({'icon': Icons.check_circle, 'color': Colors.green, 'text': 'Thời tiết ận, thích hợp đi lại và hoạt động ngoài trời hôm nay!'});
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.tips_and_updates, color: Colors.amber, size: 20),
+              const SizedBox(width: 8),
+              const Text(
+                'HƯỚNG DẪN THỜI TIẾT HÔM NAY',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 11,
+                  color: Colors.black54,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ...tips.map((t) => Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(t['icon'] as IconData, size: 20, color: t['color'] as Color),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    t['text'] as String,
+                    style: const TextStyle(fontSize: 13, height: 1.4),
+                  ),
+                ),
+              ],
+            ),
+          )),
+        ],
+      ),
     );
   }
 }
