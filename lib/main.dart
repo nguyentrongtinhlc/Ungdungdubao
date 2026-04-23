@@ -19,7 +19,7 @@ class WeatherApp extends StatelessWidget {
         useMaterial3: true,
         brightness: Brightness.light,
         colorSchemeSeed: Colors.blue,
-        scaffoldBackgroundColor: const Color(0xFFF5F7FA),
+        scaffoldBackgroundColor: Colors.transparent,
       ),
       home: const WeatherPage(),
     );
@@ -87,9 +87,10 @@ class _WeatherPageState extends State<WeatherPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: _buildSearchBox(),
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.white.withOpacity(0.85),
         elevation: 0,
         actions: [
           IconButton(
@@ -98,10 +99,17 @@ class _WeatherPageState extends State<WeatherPage> {
           ),
         ],
       ),
-      body: _weather == null
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/bg.jpg'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: _weather == null
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(16, 100, 16, 16),
               child: Column(
                 children: [
                   // 1. KHỐI AI DỰ BÁO DỰA TRÊN LỊCH SỬ
@@ -114,6 +122,8 @@ class _WeatherPageState extends State<WeatherPage> {
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      shadows: [Shadow(blurRadius: 4, color: Colors.black38)],
                     ),
                   ),
                   Text(
@@ -121,20 +131,21 @@ class _WeatherPageState extends State<WeatherPage> {
                     style: const TextStyle(
                       fontSize: 70,
                       fontWeight: FontWeight.w100,
-                      color: Colors.blueAccent,
+                      color: Colors.white,
+                      shadows: [Shadow(blurRadius: 8, color: Colors.black45)],
                     ),
                   ),
 
                   const SizedBox(height: 20),
 
-                  // 3. BẢNG DỮ LIỆU QUÁ KHỨ (Bằng chứng cho thầy cô xem)
+                  // 3. BẢNG DỮ LIỆU QUÁ KHỨ
                   if (_localDisasterInfo != null) _buildDisasterRecord(),
                   const SizedBox(height: 10),
                   _buildHistorySection(),
 
                   const SizedBox(height: 20),
 
-                  // 4. BẢN ĐỒ VỆ TINH TRẮNG
+                  // 4. BẢN ĐỒ VỆ TINH
                   _buildMap(),
 
                   // 5. GRID 6 THÔNG SỐ
@@ -143,6 +154,7 @@ class _WeatherPageState extends State<WeatherPage> {
                 ],
               ),
             ),
+      ),
     );
   }
 
