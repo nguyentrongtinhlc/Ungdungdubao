@@ -224,9 +224,33 @@ class _WeatherPageState extends State<WeatherPage> {
                 child: ListView.separated(
                   controller: ctrl,
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 30),
-                  itemCount: items.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 10),
+                  itemCount: items.length + 1,
+                  separatorBuilder: (_, i) => i == items.length - 1 ? const SizedBox.shrink() : const SizedBox(height: 10),
                   itemBuilder: (_, i) {
+                    if (i == items.length) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Divider(height: 40),
+                          const Padding(
+                            padding: EdgeInsets.only(bottom: 12),
+                            child: Text('📋 BẢNG NGƯỠNG THAM CHIẾU TỔNG QUÁT',
+                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black54)),
+                          ),
+                          _guideRow('🌡 Nhiệt độ ≥ 37°C', 'Tránh nắng 10h-16h, uống nước', Colors.red[50]!),
+                          _guideRow('🌡 Nhiệt độ ≥ 33°C', 'Áo chống nắng, đội nón', Colors.orange[50]!),
+                          _guideRow('🌡 Nhiệt độ ≤ 15°C', 'Mặc áo ấm, giữ ấm cơ thể', Colors.blue[50]!),
+                          _guideRow('🌧 Mưa > 20mm', 'Áo mưa, tránh vùng ngập lụt', Colors.indigo[50]!),
+                          _guideRow('🌧 Mưa > 5mm', 'Mang ô hoặc áo mưa', Colors.lightBlue[50]!),
+                          _guideRow('💨 Gió > 60 km/h', 'Không đi xe máy, vào nhà', Colors.red[50]!),
+                          _guideRow('💨 Gió > 30 km/h', 'Cẩn thận khi đi xe máy', Colors.orange[50]!),
+                          _guideRow('☀️ UV ≥ 8', 'Kem SPF50+, áo dài tay, khẩu trang', Colors.deepOrange[50]!),
+                          _guideRow('☀️ UV ≥ 5', 'Bôi kem chống nắng khi ra ngoài', Colors.amber[50]!),
+                          _guideRow('💧 Độ ẩm > 85%', 'Thông thoáng nhà cửa, tránh nấm', Colors.teal[50]!),
+                          _guideRow('👁 Tầm nhìn < 1km', 'Bật đèn xe, giảm tốc độ', Colors.grey[200]!),
+                        ],
+                      );
+                    }
                     final item = items[i];
                     return Container(
                       padding: const EdgeInsets.all(14),
@@ -272,12 +296,30 @@ class _WeatherPageState extends State<WeatherPage> {
                   },
                 ),
               ),
+              const Divider(height: 1),
             ],
           ),
         ),
       ),
     );
   }
+
+  Widget _guideRow(String condition, String advice, Color bg) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(10)),
+      child: Row(
+        children: [
+          Expanded(flex: 2, child: Text(condition, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500))),
+          const SizedBox(width: 8),
+          Expanded(flex: 3, child: Text(advice, style: TextStyle(fontSize: 12, color: Colors.grey[700]))),
+        ],
+      ),
+    );
+  }
+
+
 
 
   @override
