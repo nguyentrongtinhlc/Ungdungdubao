@@ -98,7 +98,10 @@ class WeatherService {
     }
 
     final prompt =
-        "Hiện tại: ${data.currentTemp}C, Mưa ${data.precipitation}mm, Gió ${data.windSpeed}km/h. $disasterContext Quá khứ 3 năm: $histContext. Dựa trên dữ liệu này (đặc biệt so sánh hiện tại với kỷ lục lịch sử), hãy dự báo thiên tai ngắn gọn cho hôm nay bằng tiếng Việt (<50 từ).";
+        "Thông tin thời tiết hiện tại: Nhiệt độ ${data.currentTemp}C, Lượng mưa ${data.precipitation}mm, Tốc độ gió ${data.windSpeed}km/h. "
+        "$disasterContext. "
+        "Dữ liệu 3 năm qua: $histContext. "
+        "YÊU CẦU: Dựa vào thời tiết hiện tại và so sánh với Kỷ lục thiên tai lịch sử, nếu thời tiết hiện tại có lượng mưa hoặc tốc độ gió cao (có khả năng hoặc nguy cơ xảy ra thiên tai tương tự), hãy phát ra 'CẢNH BÁO THIÊN TAI' và hướng dẫn chi tiết 'CÁCH PHÒNG CHỐNG'. Nếu thời tiết hiện tại an toàn, hãy dự báo bình thường. Trả lời bằng tiếng Việt (tối đa 100 từ).";
 
     try {
       final res = await http.post(
