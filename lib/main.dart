@@ -80,37 +80,110 @@ class _WeatherPageState extends State<WeatherPage> {
 
   void _showWeatherGuide() {
     final w = _weather!;
-    final List<Map<String, dynamic>> currentTips = [];
-    if (w.currentTemp >= 37) {
-      currentTips.add({'icon': Icons.thermostat, 'color': Colors.red, 'text': 'Nắng nóng gay gắt (\${w.currentTemp.round()}°C). Uống đủ nước, hạn chế ra ngoài 10h-16h.'});
-    } else if (w.currentTemp >= 33) {
-      currentTips.add({'icon': Icons.wb_sunny, 'color': Colors.orange, 'text': 'Trời nóng (\${w.currentTemp.round()}°C). Mặc áo chống nắng, đội nón khi ra đường.'});
-    } else if (w.currentTemp <= 15) {
-      currentTips.add({'icon': Icons.ac_unit, 'color': Colors.blue, 'text': 'Trời lạnh (\${w.currentTemp.round()}°C). Mặc áo ấm, giữ ấm cơ thể.'});
-    } else {
-      currentTips.add({'icon': Icons.check_circle, 'color': Colors.green, 'text': 'Nhiệt độ dễ chịu (\${w.currentTemp.round()}°C). Thích hợp ra ngoài trời.'});
-    }
-    if (w.precipitation > 20) {
-      currentTips.add({'icon': Icons.umbrella, 'color': Colors.indigo, 'text': 'Mưa rất to (\${w.precipitation}mm). Mang áo mưa, tránh vùng trũng thấp.'});
-    } else if (w.precipitation > 5) {
-      currentTips.add({'icon': Icons.umbrella, 'color': Colors.blueAccent, 'text': 'Có mưa (\${w.precipitation}mm). Nên mang theo áo mưa hoặc ô.'});
-    }
-    if (w.windSpeed > 60) {
-      currentTips.add({'icon': Icons.air, 'color': Colors.red, 'text': 'Gió rất mạnh (\${w.windSpeed}km/h). Không đi xe máy, tránh vùng trống trải.'});
-    } else if (w.windSpeed > 30) {
-      currentTips.add({'icon': Icons.air, 'color': Colors.orange, 'text': 'Gió khá mạnh (\${w.windSpeed}km/h). Cẩn thận khi đi xe máy.'});
-    }
-    if (w.uvIndex >= 8) {
-      currentTips.add({'icon': Icons.wb_sunny, 'color': Colors.deepOrange, 'text': 'Tia UV rất cao (\${w.uvIndex.round()}). Bôi kem SPF50+, mặc áo dài.'});
-    } else if (w.uvIndex >= 5) {
-      currentTips.add({'icon': Icons.wb_sunny, 'color': Colors.amber, 'text': 'Tia UV cao (\${w.uvIndex.round()}). Nên bôi kem chống nắng khi ra ngoài.'});
-    }
-    if (w.humidity > 85) {
-      currentTips.add({'icon': Icons.water_drop, 'color': Colors.teal, 'text': 'Độ ẩm rất cao (\${w.humidity.round()}%). Thông thoáng nhà cửa tránh nấm mốc.'});
-    }
-    if (w.visibility < 1) {
-      currentTips.add({'icon': Icons.visibility_off, 'color': Colors.grey, 'text': 'Tầm nhìn kém (<1km). Bật đèn xe, đi chậm và cẩn thận.'});
-    }
+
+    // Tạo bảng chỉ số hiện tại với lời khuyên
+    final items = [
+      _WeatherTipItem(
+        icon: Icons.thermostat,
+        label: 'Nhiệt độ',
+        value: '${w.currentTemp.round()}°C',
+        advice: w.currentTemp >= 37
+            ? 'Nắng nóng gay gắt! Uống đủ nước, tránh ra ngoài 10h-16h'
+            : w.currentTemp >= 33
+                ? 'Trời nóng. Mặc áo chống nắng, đội nón khi ra đường'
+                : w.currentTemp <= 15
+                    ? 'Trời lạnh. Mặc áo ấm, giữ ấm cơ thể'
+                    : w.currentTemp <= 22
+                        ? 'Mát mẻ. Thích hợp ra ngoài trời'
+                        : 'Dễ chịu. Thích hợp hoạt động ngoài trời',
+        color: w.currentTemp >= 37
+            ? Colors.red
+            : w.currentTemp >= 33
+                ? Colors.orange
+                : w.currentTemp <= 15
+                    ? Colors.blue
+                    : Colors.green,
+      ),
+      _WeatherTipItem(
+        icon: Icons.umbrella,
+        label: 'Lượng mưa',
+        value: '${w.precipitation}mm',
+        advice: w.precipitation > 20
+            ? 'Mưa rất to! Mang áo mưa, tránh vùng trũng thấp có thể ngập'
+            : w.precipitation > 5
+                ? 'Có mưa. Nên mang theo áo mưa hoặc ô'
+                : 'Không mưa. Thời tiết khô ráo',
+        color: w.precipitation > 20
+            ? Colors.indigo
+            : w.precipitation > 5
+                ? Colors.blue
+                : Colors.teal,
+      ),
+      _WeatherTipItem(
+        icon: Icons.air,
+        label: 'Tốc độ gió',
+        value: '${w.windSpeed}km/h',
+        advice: w.windSpeed > 60
+            ? 'Gió rất mạnh! Không đi xe máy, tránh vùng trống trải'
+            : w.windSpeed > 30
+                ? 'Gió khá mạnh. Cẩn thận khi đi xe máy'
+                : 'Gió nhẹ. Điều kiện di chuyển tốt',
+        color: w.windSpeed > 60
+            ? Colors.red
+            : w.windSpeed > 30
+                ? Colors.orange
+                : Colors.green,
+      ),
+      _WeatherTipItem(
+        icon: Icons.wb_sunny,
+        label: 'Chỉ số UV',
+        value: '${w.uvIndex.round()}',
+        advice: w.uvIndex >= 8
+            ? 'UV rất cao! Bôi kem SPF50+, mặc áo dài tay, đi khẩu trang'
+            : w.uvIndex >= 5
+                ? 'UV cao. Nên bôi kem chống nắng khi ra ngoài'
+                : w.uvIndex >= 3
+                    ? 'UV trung bình. Có thể bôi kem bảo vệ da'
+                    : 'UV thấp. An toàn ra ngoài không cần bảo vệ đặc biệt',
+        color: w.uvIndex >= 8
+            ? Colors.deepOrange
+            : w.uvIndex >= 5
+                ? Colors.amber
+                : Colors.green,
+      ),
+      _WeatherTipItem(
+        icon: Icons.water_drop,
+        label: 'Độ ẩm',
+        value: '${w.humidity.round()}%',
+        advice: w.humidity > 85
+            ? 'Độ ẩm rất cao! Thông thoáng nhà cửa, chú ý phòng nấm mốc'
+            : w.humidity > 70
+                ? 'Độ ẩm cao. Cơ thể dễ đổ mồ hôi, uống nhiều nước'
+                : w.humidity < 30
+                    ? 'Độ ẩm thấp. Dưỡng ẩm da, uống nhiều nước'
+                    : 'Độ ẩm bình thường. Thoải mái',
+        color: w.humidity > 85
+            ? Colors.teal
+            : w.humidity > 70
+                ? Colors.cyan
+                : Colors.green,
+      ),
+      _WeatherTipItem(
+        icon: Icons.visibility,
+        label: 'Tầm nhìn',
+        value: '${w.visibility.toStringAsFixed(1)}km',
+        advice: w.visibility < 1
+            ? 'Tầm nhìn rất kém! Bật đèn xe, đi chậm, cẩn thận khi lái xe'
+            : w.visibility < 5
+                ? 'Tầm nhìn hạn chế. Chú ý an toàn giao thông'
+                : 'Tầm nhìn tốt. Điều kiện di chuyển an toàn',
+        color: w.visibility < 1
+            ? Colors.grey
+            : w.visibility < 5
+                ? Colors.blueGrey
+                : Colors.green,
+      ),
+    ];
 
     showModalBottomSheet(
       context: context,
@@ -148,66 +221,60 @@ class _WeatherPageState extends State<WeatherPage> {
               ),
               const Divider(height: 1),
               Expanded(
-                child: ListView(
+                child: ListView.separated(
                   controller: ctrl,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      child: Text('📍 DỰA TRÊN THỜI TIẾT HIỆN TẠI',
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.deepPurple)),
-                    ),
-                    ...currentTips.map((t) => Padding(
-                      padding: const EdgeInsets.only(bottom: 14),
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 30),
+                  itemCount: items.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 10),
+                  itemBuilder: (_, i) {
+                    final item = items[i];
+                    return Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: item.color.withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: item.color.withOpacity(0.25)),
+                      ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(t['icon'] as IconData, size: 22, color: t['color'] as Color),
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: item.color.withOpacity(0.15),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(item.icon, size: 20, color: item.color),
+                          ),
                           const SizedBox(width: 12),
-                          Expanded(child: Text(t['text'] as String,
-                            style: const TextStyle(fontSize: 14, height: 1.5))),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(item.label,
+                                      style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                                    const Spacer(),
+                                    Text(item.value,
+                                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: item.color)),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Text(item.advice,
+                                  style: const TextStyle(fontSize: 13, height: 1.4)),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
-                    )),
-                    const Divider(height: 24),
-                    const Padding(
-                      padding: EdgeInsets.only(bottom: 12),
-                      child: Text('📋 BẢNG NGƯỠNG THAM CHIẾU',
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black54)),
-                    ),
-                    _guideRow('🌡 Nhiệt độ ≥ 37°C', 'Tránh nắng 10h-16h, uống nhiều nước', Colors.red[50]!),
-                    _guideRow('🌡 Nhiệt độ ≥ 33°C', 'Áo chống nắng, đội nón', Colors.orange[50]!),
-                    _guideRow('🌡 Nhiệt độ ≤ 15°C', 'Mặc áo ấm, giữ ấm cơ thể', Colors.blue[50]!),
-                    _guideRow('🌧 Mưa > 20mm', 'Áo mưa, tránh vùng ngập lụt', Colors.indigo[50]!),
-                    _guideRow('🌧 Mưa > 5mm', 'Mang ô hoặc áo mưa', Colors.lightBlue[50]!),
-                    _guideRow('💨 Gió > 60 km/h', 'Không đi xe máy, vào trong nhà', Colors.red[50]!),
-                    _guideRow('💨 Gió > 30 km/h', 'Cẩn thận khi đi xe máy', Colors.orange[50]!),
-                    _guideRow('☀️ UV ≥ 8', 'Kem SPF50+, áo dài tay, khẩu trang', Colors.deepOrange[50]!),
-                    _guideRow('☀️ UV ≥ 5', 'Bôi kem chống nắng khi ra ngoài', Colors.amber[50]!),
-                    _guideRow('💧 Độ ẩm > 85%', 'Thông thoáng nhà cửa, chống nấm mốc', Colors.teal[50]!),
-                    _guideRow('👁 Tầm nhìn < 1km', 'Bật đèn xe, giảm tốc độ', Colors.grey[200]!),
-                    const SizedBox(height: 30),
-                  ],
+                    );
+                  },
                 ),
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _guideRow(String condition, String advice, Color bg) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(10)),
-      child: Row(
-        children: [
-          Expanded(flex: 2, child: Text(condition, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500))),
-          const SizedBox(width: 8),
-          Expanded(flex: 3, child: Text(advice, style: TextStyle(fontSize: 12, color: Colors.grey[700]))),
-        ],
       ),
     );
   }
@@ -543,100 +610,21 @@ class _WeatherPageState extends State<WeatherPage> {
       ],
     );
   }
-
-  Widget _buildWeatherTips() {
-    final w = _weather!;
-    final List<Map<String, dynamic>> tips = [];
-
-    // Nhiệt độ
-    if (w.currentTemp >= 37) {
-      tips.add({'icon': Icons.thermostat, 'color': Colors.red, 'text': 'Nắng nóng gay gắt (${w.currentTemp.round()}°C). Uống đủ nước, hạn chế ra ngoài lúc 10h-16h.'});
-    } else if (w.currentTemp >= 33) {
-      tips.add({'icon': Icons.wb_sunny, 'color': Colors.orange, 'text': 'Trời nóng (${w.currentTemp.round()}°C). Nên mặc áo chống nắng, đội nón khi ra đường.'});
-    } else if (w.currentTemp <= 15) {
-      tips.add({'icon': Icons.ac_unit, 'color': Colors.blue, 'text': 'Trời lạnh (${w.currentTemp.round()}°C). Mặc áo ấm, giữ ấm cơ thể khi ra ngoài.'});
-    } else if (w.currentTemp <= 22) {
-      tips.add({'icon': Icons.air, 'color': Colors.lightBlue, 'text': 'Thời tiết mát mẻ (${w.currentTemp.round()}°C). Thích hợp đi dạo ngoài trời.'});
-    }
-
-    // Lượng mưa
-    if (w.precipitation > 20) {
-      tips.add({'icon': Icons.umbrella, 'color': Colors.indigo, 'text': 'Mưa rất to (${w.precipitation}mm). Mang áo mưa, tránh vùng trũng thấp có thể ngập nước.'});
-    } else if (w.precipitation > 5) {
-      tips.add({'icon': Icons.umbrella, 'color': Colors.blueAccent, 'text': 'Có mưa (${w.precipitation}mm). Nên mang theo áo mưa hoặc ô.'});
-    }
-
-    // Tốc độ gió
-    if (w.windSpeed > 60) {
-      tips.add({'icon': Icons.air, 'color': Colors.red, 'text': 'Gió rất mạnh (${w.windSpeed}km/h). Không nên đi xe máy, tránh vùng trống trải.'});
-    } else if (w.windSpeed > 30) {
-      tips.add({'icon': Icons.air, 'color': Colors.orange, 'text': 'Gió khá mạnh (${w.windSpeed}km/h). Cẩn thận khi đi xe máy.'});
-    }
-
-    // Chỉ số UV
-    if (w.uvIndex >= 8) {
-      tips.add({'icon': Icons.wb_sunny, 'color': Colors.deepOrange, 'text': 'Tìa UV rất cao (${w.uvIndex.round()}). Bôi kem chống nắng SPF50+, mặc áo dài, đi khẩu trang.'});
-    } else if (w.uvIndex >= 5) {
-      tips.add({'icon': Icons.wb_sunny, 'color': Colors.amber, 'text': 'Tìa UV cao (${w.uvIndex.round()}). Nên bôi kem chống nắng khi ra ngoài.'});
-    }
-
-    // Độ ẩm
-    if (w.humidity > 85) {
-      tips.add({'icon': Icons.water_drop, 'color': Colors.teal, 'text': 'Độ ẩm rất cao (${w.humidity.round()}%). Dễ nấm mốc, cần thông thoáng nhà cửa.'});
-    }
-
-    // Tầm nhìn
-    if (w.visibility < 1) {
-      tips.add({'icon': Icons.visibility_off, 'color': Colors.grey, 'text': 'Tầm nhìn rất kém (<1km). Bật đèn xe, đi chậm và cẩn thận.'});
-    }
-
-    // Nếu không có lưu ý đặc biệt nào
-    if (tips.isEmpty) {
-      tips.add({'icon': Icons.check_circle, 'color': Colors.green, 'text': 'Thời tiết ận, thích hợp đi lại và hoạt động ngoài trời hôm nay!'});
-    }
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.9),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.tips_and_updates, color: Colors.amber, size: 20),
-              const SizedBox(width: 8),
-              const Text(
-                'HƯỚNG DẪN THỜI TIẾT HÔM NAY',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 11,
-                  color: Colors.black54,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          ...tips.map((t) => Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(t['icon'] as IconData, size: 20, color: t['color'] as Color),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    t['text'] as String,
-                    style: const TextStyle(fontSize: 13, height: 1.4),
-                  ),
-                ),
-              ],
-            ),
-          )),
-        ],
-      ),
-    );
-  }
 }
+
+class _WeatherTipItem {
+  final IconData icon;
+  final String label;
+  final String value;
+  final String advice;
+  final Color color;
+
+  _WeatherTipItem({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.advice,
+    required this.color,
+  });
+}
+
