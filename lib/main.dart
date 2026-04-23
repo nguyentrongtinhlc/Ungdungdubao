@@ -405,6 +405,8 @@ class _WeatherPageState extends State<WeatherPage> {
         _stat("Độ ẩm", "${_weather!.humidity}%", Icons.water_drop),
       ],
     );
+  }
+
   Widget _buildWeatherTips() {
     final w = _weather!;
     final List<Map<String, dynamic>> tips = [];
