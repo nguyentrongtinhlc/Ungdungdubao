@@ -42,7 +42,7 @@ class WeatherService {
     final resC = await http.get(Uri.parse(currentUrl));
     final dataC = jsonDecode(resC.body)['current'];
 
-    // B. Lấy dữ liệu lịch sử (Ngày này của 3 năm trước: 2023, 2022, 2021)
+    // B. Lấy dữ liệu lịch sử (Ngày này của 3 năm trước)
     List<HistoricalWeather> historyList = [];
     final now = DateTime.now();
     for (int i = 1; i <= 3; i++) {
@@ -66,7 +66,51 @@ class WeatherService {
       }
     }
 
-    // C. Trả về đối tượng WeatherData hoàn chỉnh
+    // C. Lấy dự báo vài ngày và theo giờ từ Open-Meteo
+    final forecastUrl =
+        "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weathercode&hourly=temperature_2m,precipitation,weathercode,wind_speed_10m&timezone=auto&forecast_days=5";
+    final resF = await http.get(Uri.parse(forecastUrl));
+    final fBody = jsonDecode(resF.body);
+    final fData = fBody['daily'];
+    final hData = fBody['hourly'];
+
+    final List<ForecastDay> forecastList = [];
+    if (fData != null) {
+      final List dates = fData['time'] ?? [];
+      final List maxTemps = fData['temperature_2m_max'] ?? [];
+      final List minTemps = fData['temperature_2m_min'] ?? [];
+      final List rains = fData['precipitation_sum'] ?? [];
+      final List codes = fData['weathercode'] ?? [];
+      for (int i = 0; i < dates.length && i < 5; i++) {
+        forecastList.add(ForecastDay(
+          date: DateTime.parse(dates[i]),
+          maxTemp: (maxTemps[i] ?? 0).toDouble(),
+          minTemp: (minTemps[i] ?? 0).toDouble(),
+          precipitation: (rains[i] ?? 0).toDouble(),
+          weatherCode: (codes[i] ?? 0).toInt(),
+        ));
+      }
+    }
+
+    final List<HourlyForecast> hourlyList = [];
+    if (hData != null) {
+      final List hourTimes = hData['time'] ?? [];
+      final List temps = hData['temperature_2m'] ?? [];
+      final List precip = hData['precipitation'] ?? [];
+      final List codes = hData['weathercode'] ?? [];
+      final List winds = hData['wind_speed_10m'] ?? [];
+      for (int i = 0; i < hourTimes.length && i < 24; i++) {
+        hourlyList.add(HourlyForecast(
+          dateTime: DateTime.parse(hourTimes[i]),
+          temperature: (temps[i] ?? 0).toDouble(),
+          precipitation: (precip[i] ?? 0).toDouble(),
+          weatherCode: (codes[i] ?? 0).toInt(),
+          windSpeed: (winds[i] ?? 0).toDouble(),
+        ));
+      }
+    }
+
+    // D. Trả về đối tượng WeatherData hoàn chỉnh
     return WeatherData(
       cityName: cityName,
       currentTemp: dataC['temperature_2m'].toDouble(),
@@ -80,7 +124,9 @@ class WeatherService {
       lon: lon,
       precipitation: dataC['precipitation'].toDouble(),
       cloudCover: dataC['cloud_cover'].toInt(),
-      history: historyList, // Đưa danh sách quá khứ vào đây
+      history: historyList,
+      forecast: forecastList,
+      hourly: hourlyList,
     );
   }
 
@@ -129,7 +175,7 @@ class WeatherService {
         final avgRain = data.history.map((e) => e.rain).reduce((a, b) => a + b) / data.history.length;
         histNote = " Trung bình mưa cùng ngày 3 năm qua: ${avgRain.toStringAsFixed(1)}mm.";
       }
-      return "✅ Thời tiết hiện tại an toàn so với kỷ lục thiên tai tại $province.$histNote\n\n📌 Kỷ lục lịch sử: Mưa ${rainThreshold}mm, Gió ${windThreshold}km/h ($eventName).";
+      return "Thời tiết hiện tại an toàn so với kỷ lục thiên tai tại $province.$histNote\n\n📌 Kỷ lục lịch sử: Mưa ${rainThreshold}mm, Gió ${windThreshold}km/h ($eventName).";
     }
 
     return "🚨 CẢNH BÁO THIÊN TAI\n\n${warnings.join('\n')}\n\n🛡 CÁCH PHÒNG CHỐNG:\n${tips.join('\n')}";

@@ -304,6 +304,24 @@ class _WeatherPageState extends State<WeatherPage> {
     );
   }
 
+  String _backgroundAsset(WeatherData? weather) {
+    if (weather == null) return 'assets/images/Nắng.png';
+    if (weather.precipitation > 0.5 || _isRainCondition(weather.conditionCode)) {
+      return 'assets/images/Mưa.png';
+    }
+    if (weather.conditionCode == 0) {
+      return 'assets/images/Nắng.png';
+    }
+    if (weather.conditionCode == 1 || weather.conditionCode == 2 || weather.conditionCode == 3) {
+      return 'assets/images/Trời đẹp.png';
+    }
+    return 'assets/images/Nắng.png';
+  }
+
+  bool _isRainCondition(int code) {
+    return (code >= 51 && code <= 67) || (code >= 80 && code <= 82) || (code >= 95 && code <= 99);
+  }
+
   Widget _guideRow(String condition, String advice, Color bg) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -334,7 +352,7 @@ class _WeatherPageState extends State<WeatherPage> {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: _buildSearchBox(),
-        backgroundColor: Colors.white.withOpacity(0.85),
+        backgroundColor: Colors.white.withOpacity(0.75),
         elevation: 0,
         actions: [
           if (_weather != null)
@@ -350,9 +368,9 @@ class _WeatherPageState extends State<WeatherPage> {
         ],
       ),
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/bg.jpg'),
+            image: AssetImage(_backgroundAsset(_weather)),
             fit: BoxFit.cover,
           ),
         ),
@@ -392,7 +410,8 @@ class _WeatherPageState extends State<WeatherPage> {
                   if (_localDisasterInfo != null) _buildDisasterRecord(),
                   const SizedBox(height: 10),
                   _buildHistorySection(),
-
+                  const SizedBox(height: 10),
+                  _buildHourlySection(),
                   const SizedBox(height: 20),
 
                   // 4. BẢN ĐỒ VỆ TINH
@@ -400,6 +419,8 @@ class _WeatherPageState extends State<WeatherPage> {
 
                   // 5. GRID 6 THÔNG SỐ
                   _buildStatGrid(),
+                  const SizedBox(height: 10),
+                  _buildForecastSection(),
                   const SizedBox(height: 50),
                 ],
               ),
@@ -437,17 +458,17 @@ class _WeatherPageState extends State<WeatherPage> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isWarning ? Colors.orange[50] : Colors.blue[50],
+        color: Colors.white.withOpacity(0.75),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: isWarning ? Colors.orange[200]! : Colors.blue[100]!),
+        border: Border.all(color: Colors.white.withOpacity(0.8)),
       ),
       child: Column(
         children: [
           Row(
             children: [
               Icon(
-                isWarning ? Icons.warning_rounded : Icons.auto_awesome, 
-                color: isWarning ? Colors.deepOrange : Colors.blue, 
+                isWarning ? Icons.warning_rounded : Icons.info_outline, 
+                color: isWarning ? Colors.deepOrange : Colors.blue,
                 size: 20
               ),
               const SizedBox(width: 10),
@@ -484,42 +505,99 @@ class _WeatherPageState extends State<WeatherPage> {
   }
 
   Widget _buildDisasterRecord() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: Colors.red[50],
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.red[100]!),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.warning_amber_rounded, color: Colors.red, size: 20),
-              const SizedBox(width: 8),
-              const Text(
-                "KỶ LỤC THIÊN TAI ĐỊA PHƯƠNG",
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: InkWell(
+        onTap: _showDisasterDetail,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.75),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white.withOpacity(0.8)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              Icon(Icons.warning_amber_rounded, color: Colors.red, size: 20),
+              SizedBox(width: 8),
+              Text(
+                'Kỷ lục thiên tai',
                 style: TextStyle(
-                  fontSize: 11,
+                  fontSize: 12,
                   fontWeight: FontWeight.bold,
                   color: Colors.red,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          Text(
-            "Sự kiện: ${_localDisasterInfo!.eventName}",
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            "🌧 Mưa kỷ lục: ${_localDisasterInfo!.maxRain} mm\n💨 Gió giật cực đại: ${_localDisasterInfo!.maxWind} km/h",
-            style: const TextStyle(fontSize: 13, color: Colors.black87),
-          ),
-        ],
+        ),
+      ),
+    );
+  }
+
+  void _showDisasterDetail() {
+    final info = _localDisasterInfo!;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => Container(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            Row(
+              children: [
+                const Icon(Icons.warning_amber_rounded, color: Colors.red, size: 28),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Text(
+                    'Kỷ lục thiên tai địa phương',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            Text(
+              'Sự kiện: ${info.eventName}',
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              '🌧 Mưa kỷ lục: ${info.maxRain} mm',
+              style: const TextStyle(fontSize: 14),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              '💨 Gió giật cực đại: ${info.maxWind} km/h',
+              style: const TextStyle(fontSize: 14),
+            ),
+            const SizedBox(height: 18),
+            const Text(
+              'Lưu ý: đây là kỷ lục thiên tai trong lịch sử địa phương, không phải dự báo. Hãy luôn theo dõi tình hình thời tiết và cảnh báo mới nhất.',
+              style: TextStyle(fontSize: 13, color: Colors.black54),
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
@@ -528,8 +606,9 @@ class _WeatherPageState extends State<WeatherPage> {
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white.withOpacity(0.75),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.8)),
       ),
       child: Column(
         children: [
@@ -538,7 +617,7 @@ class _WeatherPageState extends State<WeatherPage> {
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.bold,
-              color: Colors.grey,
+              color: Colors.black,
             ),
           ),
           const SizedBox(height: 15),
@@ -574,6 +653,265 @@ class _WeatherPageState extends State<WeatherPage> {
               .toList(),
         ],
       ),
+    );
+  }
+
+  Widget _buildForecastSection() {
+    return Container(
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.75),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.8)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "DỰ BÁO VÀI NGÀY TỚI",
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey,
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 140,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: _weather!.forecast.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              itemBuilder: (_, index) {
+                final day = _weather!.forecast[index];
+                return Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(18),
+                    onTap: () => _showForecastDetail(day),
+                    child: Container(
+                      width: 110,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.blue[50],
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _weekdayName(day.date),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Center(
+                            child: Icon(
+                              _forecastIcon(day.weatherCode),
+                              color: Colors.blue[700],
+                              size: 30,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "${day.maxTemp.round()}° / ${day.minTemp.round()}°",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "${day.precipitation.toStringAsFixed(1)}mm mưa",
+                            style: const TextStyle(fontSize: 11, color: Colors.blue),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHourlySection() {
+    final now = DateTime.now();
+    final hourlyItems = _weather!.hourly.where((h) => h.dateTime.isAfter(now)).take(12).toList();
+    final items = hourlyItems.isNotEmpty ? hourlyItems : _weather!.hourly.take(12).toList();
+
+    return Container(
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.75),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.8)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "DỰ BÁO THEO GIỜ",
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey,
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 136,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: items.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              itemBuilder: (_, index) {
+                final hour = items[index];
+                return Container(
+                  width: 90,
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.blue[50],
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        _hourLabel(hour.dateTime),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Icon(
+                        _forecastIcon(hour.weatherCode),
+                        color: Colors.blue[700],
+                        size: 24,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "${hour.temperature.round()}°",
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        "${hour.precipitation.toStringAsFixed(1)}mm",
+                        style: const TextStyle(fontSize: 11, color: Colors.blue),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  IconData _forecastIcon(int code) {
+    if (code == 0) return Icons.wb_sunny;
+    if (code == 1 || code == 2 || code == 3) return Icons.wb_cloudy;
+    if (code >= 45 && code <= 48) return Icons.grain;
+    if (code >= 51 && code <= 67) return Icons.umbrella;
+    if (code >= 80 && code <= 82) return Icons.cloud;
+    if (code >= 95 && code <= 99) return Icons.flash_on;
+    return Icons.wb_sunny;
+  }
+
+  String _weekdayName(DateTime date) {
+    const names = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+    return names[date.weekday % 7];
+  }
+
+  String _hourLabel(DateTime date) {
+    return '${date.hour.toString().padLeft(2, "0")}:00';
+  }
+
+  String _forecastDescription(int code) {
+    if (code == 0) return 'Trời nắng';
+    if (code == 1 || code == 2 || code == 3) return 'Trời đẹp';
+    if (code >= 45 && code <= 48) return 'Sương mù / Mù';
+    if (code >= 51 && code <= 67) return 'Mưa';
+    if (code >= 80 && code <= 82) return 'Mưa rào';
+    if (code >= 95 && code <= 99) return 'Giông bão';
+    return 'Thời tiết khác';
+  }
+
+  void _showForecastDetail(ForecastDay day) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => Container(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            Text(
+              '${_weekdayName(day.date)} — ${day.date.day}/${day.date.month}/${day.date.year}',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Icon(_forecastIcon(day.weatherCode), size: 36, color: Colors.blue[700]),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    _forecastDescription(day.weatherCode),
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 18),
+            _detailRow('Nhiệt độ cao nhất', '${day.maxTemp.round()}°C'),
+            const SizedBox(height: 10),
+            _detailRow('Nhiệt độ thấp nhất', '${day.minTemp.round()}°C'),
+            const SizedBox(height: 10),
+            _detailRow('Lượng mưa', '${day.precipitation.toStringAsFixed(1)}mm'),
+            const SizedBox(height: 20),
+            const Text(
+              'Lưu ý: Dự báo có thể thay đổi. Hãy kiểm tra lại trước khi ra ngoài.',
+              style: TextStyle(fontSize: 13, color: Colors.black54),
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _detailRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(child: Text(label, style: const TextStyle(color: Colors.black87)) ),
+        Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
+      ],
     );
   }
 
@@ -618,9 +956,9 @@ class _WeatherPageState extends State<WeatherPage> {
 
   Widget _stat(String l, String v, IconData i) => Container(
     decoration: BoxDecoration(
-      color: Colors.white,
+      color: Colors.white.withOpacity(0.75),
       borderRadius: BorderRadius.circular(15),
-      border: Border.all(color: Colors.grey[200]!),
+      border: Border.all(color: Colors.white.withOpacity(0.8)),
     ),
     child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
