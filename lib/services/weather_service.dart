@@ -68,7 +68,7 @@ class WeatherService {
 
     // C. Lấy dự báo vài ngày và theo giờ từ Open-Meteo
     final forecastUrl =
-        "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weathercode&hourly=temperature_2m,precipitation,weathercode,wind_speed_10m&timezone=auto&forecast_days=5";
+        "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weathercode&hourly=temperature_2m,precipitation,weathercode,wind_speed_10m&timezone=auto&forecast_days=10";
     final resF = await http.get(Uri.parse(forecastUrl));
     final fBody = jsonDecode(resF.body);
     final fData = fBody['daily'];
@@ -81,7 +81,7 @@ class WeatherService {
       final List minTemps = fData['temperature_2m_min'] ?? [];
       final List rains = fData['precipitation_sum'] ?? [];
       final List codes = fData['weathercode'] ?? [];
-      for (int i = 0; i < dates.length && i < 5; i++) {
+      for (int i = 0; i < dates.length && i < 10; i++) {
         forecastList.add(ForecastDay(
           date: DateTime.parse(dates[i]),
           maxTemp: (maxTemps[i] ?? 0).toDouble(),

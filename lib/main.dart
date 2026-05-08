@@ -39,6 +39,7 @@ class _WeatherPageState extends State<WeatherPage> {
   DisasterHistory? _localDisasterInfo;
   String aiAnalysis = "Đang truy xuất dữ liệu lịch sử...";
   bool isAiLoading = false;
+  bool isSearchingCity = false;
   final MapController _mapController = MapController();
   final TextEditingController _cityController = TextEditingController();
 
@@ -66,8 +67,19 @@ class _WeatherPageState extends State<WeatherPage> {
       _mapController.move(LatLng(lat, lon), 9);
     } catch (e) {
       setState(() => isAiLoading = false);
+      _showErrorMessage("Vui lòng nhập đúng tên thành phố.");
       print("Lỗi: $e");
     }
+  }
+
+  void _showErrorMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red.shade600,
+        duration: const Duration(seconds: 3),
+      ),
+    );
   }
 
   Future<void> _initGPS() async {
@@ -380,11 +392,7 @@ class _WeatherPageState extends State<WeatherPage> {
               padding: const EdgeInsets.fromLTRB(16, 100, 16, 16),
               child: Column(
                 children: [
-                  // 1. KHỐI AI DỰ BÁO DỰA TRÊN LỊCH SỬ
-                  _buildAICard(),
-                  const SizedBox(height: 20),
-
-                  // 2. THÔNG TIN CHÍNH
+                      // 2. THÔNG TIN CHÍNH
                   Text(
                     _weather!.cityName,
                     style: const TextStyle(
@@ -439,67 +447,40 @@ class _WeatherPageState extends State<WeatherPage> {
       child: TextField(
         controller: _cityController,
         style: const TextStyle(fontSize: 14),
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           hintText: " Tìm thành phố...",
           border: InputBorder.none,
-          prefixIcon: Icon(Icons.search),
+          prefixIcon: isSearchingCity
+              ? Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                    ),
+                  ),
+                )
+              : const Icon(Icons.search),
         ),
         onSubmitted: (val) async {
-          final c = await _service.getCoords(val);
-          _fetchData(c['latitude'], c['longitude']);
+          final trimmed = val.trim();
+          if (trimmed.isEmpty) {
+            _showErrorMessage("Vui lòng nhập tên thành phố.");
+            return;
+          }
+          setState(() => isSearchingCity = true);
+          try {
+            final c = await _service.getCoords(trimmed);
+            await _fetchData(c['latitude'], c['longitude']);
+          } catch (e) {
+            _showErrorMessage("Vui lòng nhập đúng tên thành phố.");
+            print("Lỗi tìm thành phố: $e");
+          } finally {
+            setState(() => isSearchingCity = false);
+          }
         },
-      ),
-    );
-  }
-
-  Widget _buildAICard() {
-    bool isWarning = aiAnalysis.contains("CẢNH BÁO") || aiAnalysis.contains("PHÒNG CHỐNG");
-    
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.75),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.8)),
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Icon(
-                isWarning ? Icons.warning_rounded : Icons.info_outline, 
-                color: isWarning ? Colors.deepOrange : Colors.blue,
-                size: 20
-              ),
-              const SizedBox(width: 10),
-              Text(
-                isWarning ? "CẢNH BÁO THIÊN TAI & PHÒNG CHỐNG" : "DỰ BÁO DỰA TRÊN LỊCH SỬ",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 11,
-                  color: isWarning ? Colors.deepOrange : Colors.blue,
-                ),
-              ),
-              const Spacer(),
-              if (isAiLoading)
-                const SizedBox(
-                  width: 15,
-                  height: 15,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Text(
-            aiAnalysis,
-            style: TextStyle(
-              fontSize: 13,
-              height: 1.5,
-              fontWeight: isWarning ? FontWeight.w500 : FontWeight.normal,
-              color: isWarning ? Colors.red[900] : Colors.black87,
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -668,7 +649,7 @@ class _WeatherPageState extends State<WeatherPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            "DỰ BÁO VÀI NGÀY TỚI",
+            "DỰ BÁO 10 NGÀY TỚI",
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.bold,
